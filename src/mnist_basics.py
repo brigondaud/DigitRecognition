@@ -4,6 +4,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten, Conv2D
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras.datasets import mnist
+from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
 
 ##################################################
@@ -43,6 +44,22 @@ def mnist_v1():
     Y_test = np_utils.to_categorical(Y_test, 10)        # 0..9
 
     # --------------------
+    # DATA AUGMENTATION
+    # --------------------
+
+    datagen = ImageDataGenerator (
+        width_shift_range=0.075,
+        height_shift_range=0.075,
+        rotation_range=12,
+        shear_range=0.075,
+        zoom_range=0.05,
+        fill_mode='constant',
+        cval=0
+    )
+
+    datagen.fit(X_train)
+
+    # --------------------
     # NEURAL NETWORK MODEL
     # --------------------
 
@@ -61,7 +78,8 @@ def mnist_v1():
 
     # Model compilation
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
+    # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=32), epochs=1, verbose=1)
 
     # Model evaluation
     return model.evaluate(X_test, Y_test, verbose=1)
