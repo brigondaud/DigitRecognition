@@ -1,4 +1,4 @@
-#!/user/2/rigondab/2A/ISSR/virtualenv/py-keras/bin/python
+#!/user/7/pepinau/2A/SIRR/virtualenv/py-sirr/bin/python
 
 import numpy as np
 import datetime
@@ -62,10 +62,10 @@ def simple(batchSize=32, ep=1, training=60000, test=10000):
     model.add(Dense(512, activation='relu', input_shape=(784,)))
     model.add(Dense(256, activation='relu'))
     model.add(Dense(10, activation='softmax'))
-    
+
     for loss in losses:
         model.compile(loss=loss, optimizer='adam', metrics=['accuracy'])
-        tensorboard = TensorBoard(log_dir="logs/{}".format("simple:"+loss))
+        tensorboard = TensorBoard(log_dir="logs_simple/{}".format("simple:"+loss))
         model.fit(X_train, Y_train, batch_size=batchSize, epochs=ep, verbose=1, callbacks=[tensorboard])
 
         evals.append((loss, model.evaluate(X_test, Y_test, verbose=1)))
@@ -77,7 +77,7 @@ def main():
     K.set_image_dim_ordering('th')  # Tensorflow compatibility
     np.random.seed(123)             # For reproducibility
     print(simple(batchSize=50, ep=20))
-    
+
 
 
 if __name__ == "__main__":

@@ -22,9 +22,8 @@ import datetime
 # Baptiste Rigondaud                             #
 ##################################################
 
-# TODO. Use save methods from Keras to avoid recomputing the whole network at each run.
-# TODO. We can use command line parameters to either keep the model or recompute it.
-# CURRENT ACCURACY (cf. model.evaluate): 98.4%
+# CURRENT ACCURACY (cf. model.evaluate): ...
+# Based on Yann Le Cun's paper (LeNet)
 
 def prepare(dataset):
     """
@@ -96,8 +95,11 @@ def convolution(batchSize=32, ep=1, training=60000, test=10000):
     tensorboard = TensorBoard(log_dir="logs/{}".format(str(now.hour) +":"+str(now.minute)))
     early = EarlyStopping(monitor='loss', patience=2)
 
-
     model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batchSize), epochs=ep, verbose=1, callbacks=[tensorboard, early])
+
+    # Model saves
+    now = datetime.datetime.now()
+    model.save("models/sirr_mnist_archi2_" + str(now.hour) + "h" + str(now.minute) + ".h5")
 
     # Model evaluation
     return model.evaluate(X_test, Y_test, verbose=1)
@@ -106,7 +108,7 @@ def convolution(batchSize=32, ep=1, training=60000, test=10000):
 def main():
     K.set_image_dim_ordering('th')  # Tensorflow compatibility
     np.random.seed(123)             # For reproducibility
-    print(convolution(batchSize=50, ep=1))
+    print(convolution(batchSize=50, ep=20))
     print("\n\nFor Tensorboard, execute: tensorboard --logdir=logs/\n\n")
 
 

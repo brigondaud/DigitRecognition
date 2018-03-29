@@ -11,7 +11,6 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
 
 from keras.callbacks import TensorBoard
-import datetime
 
 ##################################################
 # Intelligent systems: reasoning and recognition #
@@ -22,9 +21,7 @@ import datetime
 # Baptiste Rigondaud                             #
 ##################################################
 
-# TODO. Use save methods from Keras to avoid recomputing the whole network at each run.
-# TODO. We can use command line parameters to either keep the model or recompute it.
-# CURRENT ACCURACY (cf. model.evaluate): 98.4%
+# CURRENT ACCURACY (cf. model.evaluate): 99.45%
 
 def prepare(dataset):
     """
