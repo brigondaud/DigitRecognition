@@ -10,7 +10,7 @@ from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
 
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, EarlyStopping
 import datetime
 
 ##################################################
@@ -53,17 +53,17 @@ def augmentedData(trainningData):
     datagen.fit(trainningData)
     return datagen
 
-def mnist_v1():
+def convolution(batchSize=32, ep=1, training=60000, test=10000):
     """
     Basic version of handwritten digits recognition.
     """
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
 
     # Data preparation
-    X_train = prepare(X_train)
-    X_test = prepare(X_test)
-    Y_train = np_utils.to_categorical(Y_train, 10)      # 0..9
-    Y_test = np_utils.to_categorical(Y_test, 10)        # 0..9
+    X_train = prepare(X_train[:training])
+    X_test = prepare(X_test[:test])
+    Y_train = np_utils.to_categorical(Y_train[:training], 10)      # 0..9
+    Y_test = np_utils.to_categorical(Y_test[:test], 10)        # 0..9
 
     # Fitting the data to the augmentation data generator
     datagen = augmentedData(X_train)
@@ -75,29 +75,29 @@ def mnist_v1():
     # Model architecture
     model = Sequential()
 
-    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(1, 28, 28)))
-    model.add(Conv2D(32, (3, 3), activation='relu'))
+    # 4 filters per image: but takes too long
+    model.add(Conv2D(filters=batchSize, kernel_size=(4, 4), activation='relu', input_shape=(1, 28, 28)))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
+
+    # 6 filters per image: but takes too long
+    model.add(Conv2D(filters=batchSize, kernel_size=(4, 4), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dropout(0.5))
+
+    model.add(Dense(6 * batchSize, activation='relu'))
     model.add(Dense(10, activation='softmax'))
 
     # Model compilation
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=128), epochs=20, verbose=1)
 
-    #Tensor board saves
+    #Tensor board saves and early stopping callbacks
     now = datetime.datetime.now()
-    tensorboard = TensorBoard(log_dir="logs_first/{}".format(str(now.hour) +":"+str(now.minute)))
-    # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1, callbacks=[tensorboard])
+    tensorboard = TensorBoard(log_dir="logs/{}".format(str(now.hour) +":"+str(now.minute)))
+    early = EarlyStopping(monitor='loss', patience=2)
 
-    # Model saves
-    now = datetime.datetime.now()
-    model.save("sirr_mnist_first_" + str(now.hour) + "h" + str(now.minute) + ".h5")
+
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batchSize), epochs=ep, verbose=1, callbacks=[tensorboard, early])
 
     # Model evaluation
     return model.evaluate(X_test, Y_test, verbose=1)
@@ -106,8 +106,8 @@ def mnist_v1():
 def main():
     K.set_image_dim_ordering('th')  # Tensorflow compatibility
     np.random.seed(123)             # For reproducibility
-    print(mnist_v1())
-    print("\n\nFor Tensorboard, execute: tensorboard --logdir=logs_first/\n\n")
+    print(convolution(batchSize=50, ep=1))
+    print("\n\nFor Tensorboard, execute: tensorboard --logdir=logs/\n\n")
 
 
 if __name__ == "__main__":
