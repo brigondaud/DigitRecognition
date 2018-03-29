@@ -2,6 +2,7 @@
 
 import numpy as np
 import datetime
+from keras.utils import multi_gpu_model
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten, Conv2D
 from keras.layers import Convolution2D, MaxPooling2D
@@ -83,15 +84,16 @@ def mnist_v1():
     model.add(Dense(10, activation='softmax'))
 
     # Model compilation
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    gpu_model = multi_gpu_model(model)
+    gpu_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1)
+    gpu_model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1)
 
     now = datetime.datetime.now()
-    model.save("sirr_epochs20_" + str(now.hour) + "h" + str(now.minute) + ".h5")
+    gpu_model.save("sirr_epochs20_" + str(now.hour) + "h" + str(now.minute) + ".h5")
 
     # Model evaluation
-    return model.evaluate(X_test, Y_test, verbose=1)
+    return gpu_model.evaluate(X_test, Y_test, verbose=1)
 
 
 def main():
