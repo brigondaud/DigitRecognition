@@ -85,7 +85,7 @@ def mnist_v1():
     # Model compilation
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1)
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=128), epochs=20, verbose=1)
 
     now = datetime.datetime.now()
     model.save("sirr_epochs20_" + str(now.hour) + "h" + str(now.minute) + ".h5")
