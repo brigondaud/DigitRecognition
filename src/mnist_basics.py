@@ -1,4 +1,4 @@
-#!/user/7/pepinau/2A/SIRR/virtualenv/py-sirr/bin/python
+#!/user/2/rigondab/2A/ISSR/virtualenv/py-keras/bin/python
 
 import numpy as np
 import datetime
@@ -9,6 +9,9 @@ from keras.utils import np_utils
 from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
+
+from keras.callbacks import TensorBoard
+import datetime
 
 ##################################################
 # Intelligent systems: reasoning and recognition #
@@ -84,12 +87,13 @@ def mnist_v1():
 
     # Model compilation
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1)
 
+    #Tensor board saves
     now = datetime.datetime.now()
-    model.save("sirr_epochs20_" + str(now.hour) + "h" + str(now.minute) + ".h5")
-
+    tensorboard = TensorBoard(log_dir="logs/{}".format(str(now.hour) +":"+str(now.minute)))
+    # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1, callbacks=[tensorboard])
+    
     # Model evaluation
     return model.evaluate(X_test, Y_test, verbose=1)
 
@@ -98,6 +102,7 @@ def main():
     K.set_image_dim_ordering('th')  # Tensorflow compatibility
     np.random.seed(123)             # For reproducibility
     print(mnist_v1())
+    print("\n\nFor Tensorboard, execute: tensorboard --logdir=logs/\n\n")
 
 
 if __name__ == "__main__":
