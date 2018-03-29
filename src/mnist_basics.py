@@ -1,3 +1,5 @@
+#!/user/7/pepinau/2A/SIRR/virtualenv/py-sirr/bin/python
+
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten, Conv2D
@@ -11,7 +13,7 @@ from keras import backend as K
 #      NEURAL NETWORK PROGRAMMING EXERCISE       #
 ##################################################
 # Jose Munoz                                     #
-# Aurélien Pepin                                 #
+# Aurelien Pepin                                 #
 # Baptiste Rigondaud                             #
 ##################################################
 
@@ -61,7 +63,7 @@ def mnist_v1():
 
     # Model compilation
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
+    model.fit(X_train, Y_train, batch_size=32, epochs=2, verbose=1)
 
     # Model evaluation
     return model.evaluate(X_test, Y_test, verbose=1)
