@@ -34,12 +34,12 @@ def main():
     predictions = model.predict_classes(X_test)
     bad_predictions = [i for i, (p, y) in enumerate(zip(predictions, y_test)) if p != y]
 
-    # Plot 25 random incorrect predictions
+    # Plot 16 random incorrect predictions
     random.shuffle(bad_predictions)
 
-    for i, c in enumerate(bad_predictions[:25]):
-        plt.subplot(5,5,i + 1)
-        plt.imshow(X_test[c].reshape(28,28), cmap='gray', interpolation='none')
+    for i, c in enumerate(bad_predictions[:min([16, len(bad_predictions)])]):
+        plt.subplot(4, 4, i + 1)
+        plt.imshow(X_test[c].reshape(28,28), interpolation='none')
         plt.title("Not {} but {}".format(predictions[c], y_test[c]))
         plt.xticks([])
         plt.yticks([])

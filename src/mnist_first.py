@@ -1,5 +1,6 @@
 #!/user/7/pepinau/2A/SIRR/virtualenv/py-sirr/bin/python
 
+import sys
 import numpy as np
 import datetime
 from keras.models import Sequential
@@ -33,7 +34,7 @@ def prepare(dataset):
     dataset /= 255
     return dataset
 
-def augmentedData(trainningData):
+def augmentedData(trainingData):
     """
     Data augmentation for training data.
     """
@@ -47,10 +48,10 @@ def augmentedData(trainningData):
         cval=0
     )
 
-    datagen.fit(trainningData)
+    datagen.fit(trainingData)
     return datagen
 
-def mnist_v1():
+def mnist_v1(batch_size=128, epochs=20, kernel_size=3):
     """
     Basic version of handwritten digits recognition.
     """
@@ -72,8 +73,8 @@ def mnist_v1():
     # Model architecture
     model = Sequential()
 
-    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(1, 28, 28)))
-    model.add(Conv2D(32, (3, 3), activation='relu'))
+    model.add(Conv2D(32, (kernel_size, kernel_size), activation='relu', input_shape=(1, 28, 28)))
+    model.add(Conv2D(32, (kernel_size, kernel_size), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
 
@@ -84,17 +85,17 @@ def mnist_v1():
 
     # Model compilation
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=128), epochs=20, verbose=1)
 
     #Tensor board saves
     now = datetime.datetime.now()
-    tensorboard = TensorBoard(log_dir="logs_first/{}".format(str(now.hour) +":"+str(now.minute)))
+    # tensorboard = TensorBoard(log_dir="logs_first/{}".format(str(now.hour) +":"+str(now.minute)))
+    tensorboard = TensorBoard(log_dir="logs_first/kernel_size:{}".format(kernel_size))
     # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=100), epochs=20, verbose=1, callbacks=[tensorboard])
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size), epochs=epochs, verbose=1, callbacks=[tensorboard])
 
     # Model saves
     now = datetime.datetime.now()
-    model.save("sirr_mnist_first_" + str(now.hour) + "h" + str(now.minute) + ".h5")
+    model.save("sirr_HYPERPARAMETERS_mnist_first_" + str(now.hour) + "h" + str(now.minute) + ".h5")
 
     # Model evaluation
     return model.evaluate(X_test, Y_test, verbose=1)
