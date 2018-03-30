@@ -22,7 +22,9 @@ from keras.callbacks import TensorBoard
 # Baptiste Rigondaud                             #
 ##################################################
 
+# (1) First neural network model
 # CURRENT ACCURACY (cf. model.evaluate): 99.45%
+
 
 def prepare(dataset):
     """
@@ -33,6 +35,7 @@ def prepare(dataset):
     dataset = dataset.astype('float32')
     dataset /= 255
     return dataset
+
 
 def augmentedData(trainingData):
     """
@@ -50,6 +53,7 @@ def augmentedData(trainingData):
 
     datagen.fit(trainingData)
     return datagen
+
 
 def mnist_v1(batch_size=128, epochs=20, kernel_size=3):
     """
@@ -88,9 +92,8 @@ def mnist_v1(batch_size=128, epochs=20, kernel_size=3):
 
     #Tensor board saves
     now = datetime.datetime.now()
-    # tensorboard = TensorBoard(log_dir="logs_first/{}".format(str(now.hour) +":"+str(now.minute)))
     tensorboard = TensorBoard(log_dir="logs_first/kernel_size:{}".format(kernel_size))
-    # model.fit(X_train, Y_train, batch_size=32, epochs=1, verbose=1)
+
     model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size), epochs=epochs, verbose=1, callbacks=[tensorboard])
 
     # Model saves

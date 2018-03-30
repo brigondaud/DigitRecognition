@@ -22,8 +22,9 @@ import datetime
 # Baptiste Rigondaud                             #
 ##################################################
 
-# CURRENT ACCURACY (cf. model.evaluate): ...
+# CURRENT ACCURACY (cf. model.evaluate): 99.41%
 # Based on Yann Le Cun's paper (LeNet)
+
 
 def prepare(dataset):
     """
@@ -34,6 +35,7 @@ def prepare(dataset):
     dataset = dataset.astype('float32')
     dataset /= 255
     return dataset
+
 
 def augmentedData(trainningData):
     """
@@ -51,6 +53,7 @@ def augmentedData(trainningData):
 
     datagen.fit(trainningData)
     return datagen
+
 
 def convolution(batchSize=32, ep=1, training=60000, test=10000):
     """
