@@ -1,4 +1,4 @@
-#!/user/7/pepinau/2A/SIRR/virtualenv/py-sirr/bin/python
+#!/user/2/rigondab/2A/ISSR/virtualenv/py-keras/bin/python
 
 import numpy as np
 import datetime
@@ -33,7 +33,7 @@ def prepare(dataset, size):
     dataset /= 255
     return dataset
 
-def simple(batchSize=32, ep=1, training=60000, test=10000):
+def simple(batchSize=32, ep=1, training=60000, test=10000, testing="loss"):
     """
     Simple version to test loss function
     """
@@ -43,6 +43,10 @@ def simple(batchSize=32, ep=1, training=60000, test=10000):
             'mean_absolute_error',
             'categorical_crossentropy',
             'logcosh']
+
+    optimizers=['sgd',
+                'adagrad',
+                'adagrad']
 
     evals = []
 
@@ -63,12 +67,28 @@ def simple(batchSize=32, ep=1, training=60000, test=10000):
     model.add(Dense(256, activation='relu'))
     model.add(Dense(10, activation='softmax'))
 
-    for loss in losses:
-        model.compile(loss=loss, optimizer='adam', metrics=['accuracy'])
-        tensorboard = TensorBoard(log_dir="logs_simple/{}".format("simple:"+loss))
-        model.fit(X_train, Y_train, batch_size=batchSize, epochs=ep, verbose=1, callbacks=[tensorboard])
+    if(testing == "loss"):
+        print("Testing losses: ")
+        for loss in losses:
+            #Testing the loss function with the adam optimizer
+            model.compile(loss=loss, optimizer='adam', metrics=['accuracy'])
+            tensorboard = TensorBoard(log_dir="logs_simple/{}".format("simple:"+loss))
+            model.fit(X_train, Y_train, batch_size=batchSize, epochs=ep, verbose=1, callbacks=[tensorboard])
 
-        evals.append((loss, model.evaluate(X_test, Y_test, verbose=1)))
+            evals.append((loss, model.evaluate(X_test, Y_test, verbose=1)))
+
+    elif(testing == "optim"):
+        print("Testing optimizers: ")
+        for optim in optimizers:
+                # Testing the optimizers with a mean squared error loss function
+                model.compile(loss="mean_squared_error", optimizer=optim, metrics=['accuracy'])
+                tensorboard = TensorBoard(log_dir="logs_simple/{}".format("simple:"+optim))
+                model.fit(X_train, Y_train, batch_size=batchSize, epochs=ep, verbose=1, callbacks=[tensorboard])
+
+                evals.append((optim, model.evaluate(X_test, Y_test, verbose=1)))
+
+    else:
+        print("Testing step unknown.")
 
     return evals
 
@@ -76,7 +96,7 @@ def simple(batchSize=32, ep=1, training=60000, test=10000):
 def main():
     K.set_image_dim_ordering('th')  # Tensorflow compatibility
     np.random.seed(123)             # For reproducibility
-    print(simple(batchSize=50, ep=20))
+    print(simple(batchSize=50, ep=20, testing="optim"))
 
 
 
