@@ -46,7 +46,7 @@ def simple(batchSize=32, ep=1, training=60000, test=10000, testing="loss"):
 
     optimizers=['sgd',
                 'adagrad',
-                'adagrad']
+                'adam']
 
     evals = []
 
