@@ -96,9 +96,14 @@ def simple(batchSize=32, ep=1, training=60000, test=10000, testing="loss"):
 def main():
     K.set_image_dim_ordering('th')  # Tensorflow compatibility
     np.random.seed(123)             # For reproducibility
-    resultLoss = simple(batchSize=50, ep=20)
+    # Loss test
+    #resultLoss = simple(batchSize=50, ep=20)
+    
+    # Optim test
     resultOptim = simple(batchSize=50, ep=20, testing="optim")
-    print(resultLoss, resultOptim)
+    
+    #print(resultLoss)
+    print(resultOptim)
 
 
 
